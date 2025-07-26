@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading Screen</title>
+    <style>
+        #loading {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loading">Loading...</div>
+
+    <div id="content" style="display: none;">
+        <h1>Welcome to My Website</h1>
+        <p>The content is now loaded.</p>
+    </div>
+
+    <script>
+        document.onreadystatechange = function() {
+            if (document.readyState === "complete") {
+                setTimeout(() => {
+                    document.getElementById("loading").style.display = "none";
+                    document.getElementById("content").style.display = "block";
+                }, 2500); // Simulating a delay
+            }
+        };
+    </script>
+
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hamburger Menu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Navbar -->
+    <nav class="bg-blue-600 p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-white text-2xl font-bold">My Website</h1>
+            
+            <!-- Hamburger Icon -->
+            <button id="menu-btn" class="text-white text-3xl md:hidden focus:outline-none">
+                ☰
+            </button>
+
+            <!-- Menu Items -->
+            <ul id="menu" class="hidden md:flex space-x-4 text-white">
+                <li><a href="#" class="hover:underline">Home</a></li>
+                <li><a href="#" class="hover:underline">About</a></li>
+                <li><a href="#" class="hover:underline">Services</a></li>
+                <li><a href="#" class="hover:underline">Contact</a></li>
+            </ul>
+        </div>
+
+        <!-- Mobile Menu -->
+        <ul id="mobile-menu" class="hidden flex-col space-y-2 bg-blue-700 text-white p-4 md:hidden">
+            <li><a href="#" class="block hover:underline">Home</a></li>
+            <li><a href="#" class="block hover:underline">About</a></li>
+            <li><a href="#" class="block hover:underline">Services</a></li>
+            <li><a href="#" class="block hover:underline">Contact</a></li>
+        </ul>
+    </nav>
+
+    <script>
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+    </script>
+
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MyCompany - Web & Ads Services</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3 fixed-top" data-aos="fade-down">
+    <div class="container">
+      <a class="navbar-brand fw-bold fs-4" href="#">
+        <img src="logo.png" alt="Logo" width="40" class="me-2"> MyCompany
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-center" id="mainNavbar">
+        <ul class="navbar-nav mb-2 mb-lg-0 gap-3">
+          <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+          <li class="nav-item"><a class="nav-link" href="#portfolio">Portfolio</a></li>
+          <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+<section class="hero-section d-flex align-items-center justify-content-center text-white text-center" id="hero">
+  <div class="overlay"></div>
+  <div class="content position-relative z-1" data-aos="zoom-in">
+    <h1 class="display-4 fw-bold">We Build Websites & Run Ads That Convert</h1>
+    <p class="lead mt-3 mb-4">Get custom websites and digital campaigns tailored for your success.</p>
+    <a href="#contact" class="btn btn-primary px-4 py-2">Get a Free Quote</a>
+  </div>
+</section>
+<!-- Services Section -->
+<section class="services-section py-5" id="services">
+  <div class="container text-center" data-aos="fade-up">
+    <h2 class="fw-bold mb-4">Our Services</h2>
+    <p class="mb-5">We help businesses grow with modern websites and high-converting ad campaigns.</p>
+    
+    <div class="row g-4">
+      <!-- MongoDB & Express -->
+      <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="card h-100 shadow-sm p-4 border-0">
+          <i class="bi bi-hdd-network fs-1 text-primary mb-3"></i>
+          <h5 class="fw-bold">MongoDB & Express</h5>
+          <p>Robust backend APIs and database handling using MongoDB and Express.js.</p>
+        </div>
+      </div>
+
+      <!-- React -->
+      <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="card h-100 shadow-sm p-4 border-0">
+          <i class="bi bi-laptop-fill fs-1 text-success mb-3"></i>
+          <h5 class="fw-bold">React Frontend</h5>
+          <p>Interactive, fast, and responsive user interfaces built with React.js.</p>
+        </div>
+      </div>
+
+      <!-- Node.js & Hosting -->
+      <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+        <div class="card h-100 shadow-sm p-4 border-0">
+          <i class="bi bi-cpu-fill fs-1 text-warning mb-3"></i>
+          <h5 class="fw-bold">Node.js & Hosting</h5>
+          <p>Scalable backend logic and API deployment to cloud platforms like Vercel, Render, etc.</p>
+        </div>
+      </div>
+
+      <!-- Git & GitHub -->
+      <div class="col-md-4" data-aos="fade-up" data-aos-delay="400">
+        <div class="card h-100 shadow-sm p-4 border-0">
+          <i class="bi bi-git fs-1 text-danger mb-3"></i>
+          <h5 class="fw-bold">Git & GitHub</h5>
+          <p>Version control and collaboration using Git and GitHub for professional workflows.</p>
+        </div>
+      </div>
+
+      <!-- WordPress -->
+      <div class="col-md-4" data-aos="fade-up" data-aos-delay="500">
+        <div class="card h-100 shadow-sm p-4 border-0">
+          <i class="bi bi-wordpress fs-1 text-primary mb-3"></i>
+          <h5 class="fw-bold">WordPress Development</h5>
+          <p>Custom websites, blogs, and business sites with themes and plugins tailored to you.</p>
+        </div>
+      </div>
+
+      <!-- Shopify -->
+      <div class="col-md-4" data-aos="fade-up" data-aos-delay="600">
+        <div class="card h-100 shadow-sm p-4 border-0">
+          <i class="bi bi-bag-check-fill fs-1 text-success mb-3"></i>
+          <h5 class="fw-bold">Shopify Store Setup</h5>
+          <p>Modern, responsive eCommerce stores with product management and custom themes.</p>
+        </div>
+      </div>
+
+      <!-- Facebook & Google Ads -->
+      <div class="col-md-6 mx-auto" data-aos="fade-up" data-aos-delay="700">
+        <div class="card h-100 shadow-sm p-4 border-0">
+          <i class="bi bi-bullseye fs-1 text-info mb-3"></i>
+          <h5 class="fw-bold">Facebook & Google Ads</h5>
+          <p>Targeted campaigns on Facebook, Instagram, YouTube & Google to drive traffic and sales.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- Portfolio Section -->
+<section class="portfolio-section py-5 bg-light" id="portfolio">
+  <div class="container text-center" data-aos="fade-up">
+    <h2 class="fw-bold mb-4">Our Portfolio</h2>
+    <p class="mb-5">A glimpse of websites and campaigns we’ve successfully delivered.</p>
+    
+    <div class="row g-4">
+      <!-- Project 1 -->
+      <div class="col-md-4" data-aos="zoom-in" data-aos-delay="100">
+        <div class="card border-0 shadow-sm">
+          <img src="ttps://images.unsplash.com/photo-1612831661434-8732b6fbd2f6?auto=format&fit=crop&w=1200&q=80" class="card-img-top" alt="Project 1">
+          <div class="card-body">
+            <h5 class="card-title">MERN Admin Dashboard</h5>
+          </div>
+        </div>
+      </div>
+
+      <!-- Project 2 -->
+      <div class="col-md-4" data-aos="zoom-in" data-aos-delay="200">
+        <div class="card border-0 shadow-sm">
+          <img src="https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg" class="card-img-top" alt="Project 2">
+          <div class="card-body">
+            <h5 class="card-title">WordPress Business Website</h5>
+          </div>
+        </div>
+      </div>
+
+      <!-- Project 3 -->
+      <div class="col-md-4" data-aos="zoom-in" data-aos-delay="300">
+        <div class="card border-0 shadow-sm">
+          <img src="https://images.pexels.com/photos/5632403/pexels-photo-5632403.jpeg" class="card-img-top" alt="Project 3">
+          <div class="card-body">
+            <h5 class="card-title">Shopify eCommerce Store</h5>
+          </div>
+        </div>
+      </div>
+
+      <!-- Project 4 -->
+      <div class="col-md-4" data-aos="zoom-in" data-aos-delay="400">
+        <div class="card border-0 shadow-sm">
+          <img src="https://via.placeholder.com/400x250?text=Google+Ads+Campaign" class="card-img-top" alt="Project 4">
+          <div class="card-body">
+            <h5 class="card-title">Google Ads Campaign</h5>
+          </div>
+        </div>
+      </div>
+
+      <!-- Project 5 -->
+      <div class="col-md-4" data-aos="zoom-in" data-aos-delay="500">
+        <div class="card border-0 shadow-sm">
+          <img src="https://images.unsplash.com/photo-1556740749-887f6717d7e4" class="card-img-top" alt="Project 5">
+          <div class="card-body">
+            <h5 class="card-title">Facebook Ads - Lead Generation</h5>
+          </div>
+        </div>
+      </div>
+
+      <!-- Project 6 -->
+      <div class="col-md-4" data-aos="zoom-in" data-aos-delay="600">
+        <div class="card border-0 shadow-sm">
+          <img src="https://images.unsplash.com/photo-1545239351-1141bd82e8a6" class="card-img-top" alt="Project 6">
+          <div class="card-body">
+            <h5 class="card-title">React Business Landing Page</h5>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+<!-- About Section -->
+<section class="about-section py-5" id="about">
+  <div class="container" data-aos="fade-right">
+    <div class="row align-items-center">
+      <div class="col-md-6">
+        <h2 class="fw-bold mb-4">About Our Company</h2>
+        <p>We are a passionate team of developers and marketers committed to building high-performing web solutions and targeted ad campaigns. Our goal is to help businesses grow with modern technology and smart strategy.</p>
+        <p>From full-stack MREN websites to Shopify stores and digital advertising, we offer everything you need to stand out online.</p>
+      </div>
+      <div class="col-md-6" data-aos="zoom-in">
+        <img src="https://via.placeholder.com/500x300?text=Team+Work" class="img-fluid rounded shadow-sm" alt="Our Team">
+      </div>
+    </div>
+  </div>
+</section>
+<!-- Contact Section -->
+<section class="contact-section py-5 bg-light" id="contact">
+  <div class="container" data-aos="fade-up">
+    <h2 class="text-center fw-bold mb-4">Contact Us</h2>
+    <p class="text-center mb-5">Have a project in mind or need help growing your business? Let’s talk.</p>
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <form>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <input type="text" class="form-control" placeholder="Your Name" required>
+            </div>
+            <div class="col-md-6">
+              <input type="email" class="form-control" placeholder="Your Email" required>
+            </div>
+            <div class="col-12">
+              <textarea class="form-control" rows="5" placeholder="Your Message" required></textarea>
+            </div>
+            <div class="col-12 text-center">
+              <button type="submit" class="btn btn-primary px-4">Send Message</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- WhatsApp Button -->
+<a href="https://wa.me/+923175265316" class="whatsapp-btn" target="_blank" aria-label="Chat on WhatsApp">
+  <i class="bi bi-whatsapp"></i>
+</a>
+
+
+
+
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+  // Collapse mobile nav on link click
+  const navLinks = document.querySelectorAll('.navbar-collapse .nav-link');
+  const navbarCollapse = document.querySelector('.navbar-collapse');
+
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      const bsCollapse = new bootstrap.Collapse(navbarCollapse, {
+        toggle: false
+      });
+      bsCollapse.hide();
+    });
+  });
+</script>
+
+  <script>
+    AOS.init();
+  </script>
+</body>
+</html>

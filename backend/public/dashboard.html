@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .message { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+    button.logout { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h2>Admin Dashboard</h2>
+  <div id="messages">Loading messages...</div>
+  <button class="logout" onclick="logout()">Logout</button>
+
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert("Please login first.");
+      window.location.href = "/admin-login.html";
+    }
+
+    fetch('/api/contact', {
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
+    })
+    .then(res => res.json())
+    .then(messages => {
+      const container = document.getElementById('messages');
+      container.innerHTML = "<h3>Contact Messages</h3>";
+      messages.forEach(msg => {
+        const div = document.createElement('div');
+        div.className = 'message';
+        div.innerHTML = `<strong>${msg.name}</strong> (${msg.email})<br>${msg.message}`;
+        container.appendChild(div);
+      });
+    });
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = "/admin-login.html";
+    }
+  </script>
+</body>
+</html>
