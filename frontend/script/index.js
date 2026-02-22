@@ -1,5 +1,5 @@
 
-const API = "https://blogsite-3-zaob.onrender.com/api/blogs"; // Render backend API
+const API = "https://full-project-5.onrender.com/api/blogs"; // Render backend API
 let allBlogs = [];
 
 // ------------------------
