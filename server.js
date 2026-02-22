@@ -29,14 +29,14 @@ app.use(express.urlencoded({ extended: true }));
 
 // -----------------------
 // ✅ ROBOTS.TXT
-// Must be first
+// Allow all search engines
 // -----------------------
 app.get("/robots.txt", (req, res) => {
   res.setHeader("Content-Type", "text/plain");
   res.send(`User-agent: *
 Allow: /
 
-Sitemap: https://blogsite-3-zaob.onrender.com/sitemap.xml`);
+Sitemap: https://full-project-5.onrender.com/sitemap.xml`);
 });
 
 // -----------------------
@@ -117,26 +117,59 @@ app.get("/api/frontend/blogs", async (req, res) => {
 });
 
 // -----------------------
-// ✅ MANUAL SITEMAP.XML
-// Serve manual sitemap from frontend folder
+// ✅ SITEMAP.XML
+// Dynamic + Manual option
 // -----------------------
-app.get("/sitemap.xml", (req, res) => {
-  const sitemapPath = path.join(__dirname, "frontend", "sitemap.xml");
+app.get("/sitemap.xml", async (req, res) => {
+  res.setHeader("Content-Type", "application/xml");
+  const baseUrl = "https://blogsite-3-zaob.onrender.com";
 
-  fs.readFile(sitemapPath, "utf8", (err, data) => {
-    if (err) {
-      console.error("❌ Failed to read sitemap.xml:", err);
-      return res.status(500).send(`<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://blogsite-3-zaob.onrender.com/</loc>
-  </url>
-</urlset>`);
+  try {
+    // Check if manual sitemap exists
+    const manualPath = path.join(__dirname, "frontend", "sitemap.xml");
+    if (fs.existsSync(manualPath)) {
+      const manualXml = fs.readFileSync(manualPath, "utf-8");
+      return res.status(200).send(manualXml);
     }
 
-    res.setHeader("Content-Type", "application/xml");
-    res.status(200).send(data);
-  });
+    // Else generate dynamic sitemap
+    const blogs = await Blog.find().select("slug updatedAt");
+
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>`;
+    xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
+
+    // Homepage
+    xml += `
+  <url>
+    <loc>${baseUrl}/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>`;
+
+    // Blog posts
+    blogs.forEach(blog => {
+      xml += `
+  <url>
+    <loc>${baseUrl}/post/${escapeXml(blog.slug)}</loc>
+    <lastmod>${(blog.updatedAt || new Date()).toISOString()}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>`;
+    });
+
+    xml += `</urlset>`;
+    res.status(200).send(xml);
+
+  } catch (err) {
+    console.error("❌ Sitemap error:", err);
+    // Fallback sitemap
+    res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${baseUrl}/</loc>
+  </url>
+</urlset>`);
+  }
 });
 
 // -----------------------
