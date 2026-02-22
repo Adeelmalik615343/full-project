@@ -10,7 +10,7 @@ const router = express.Router();
 // -----------------------
 router.get("/", (req, res) => {
   const adminKey = req.query.key;
-  if (adminKey !== "12345") return res.status(403).send("Access Denied");
+  if (adminKey !== "54321") return res.status(403).send("Access Denied");
 
   res.sendFile(path.join(__dirname, "../../frontend/admin/admin.html"));
 });
