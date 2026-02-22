@@ -3,6 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
+const fs = require("fs");
 
 const Blog = require("./models/Blog");
 const blogRoutes = require("./routes/blogRoutes");
@@ -116,51 +117,26 @@ app.get("/api/frontend/blogs", async (req, res) => {
 });
 
 // -----------------------
-// ✅ DYNAMIC SITEMAP.XML
-// Fully Google Safe
+// ✅ MANUAL SITEMAP.XML
+// Serve manual sitemap from frontend folder
 // -----------------------
-app.get("/sitemap.xml", async (req, res) => {
-  res.setHeader("Content-Type", "application/xml");
-  const baseUrl = "https://blogsite-3-zaob.onrender.com";
+app.get("/sitemap.xml", (req, res) => {
+  const sitemapPath = path.join(__dirname, "frontend", "sitemap.xml");
 
-  try {
-    const blogs = await Blog.find().select("slug updatedAt");
-
-    let xml = `<?xml version="1.0" encoding="UTF-8"?>`;
-    xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
-
-    // Homepage
-    xml += `
-  <url>
-    <loc>${baseUrl}/</loc>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>`;
-
-    // Blog posts
-    blogs.forEach(blog => {
-      xml += `
-  <url>
-    <loc>${baseUrl}/post/${escapeXml(blog.slug)}</loc>
-    <lastmod>${(blog.updatedAt || new Date()).toISOString()}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>`;
-    });
-
-    xml += `</urlset>`;
-    res.status(200).send(xml);
-
-  } catch (err) {
-    console.error("❌ Sitemap error:", err);
-    // Fallback sitemap with homepage only
-    res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?>
+  fs.readFile(sitemapPath, "utf8", (err, data) => {
+    if (err) {
+      console.error("❌ Failed to read sitemap.xml:", err);
+      return res.status(500).send(`<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>${baseUrl}/</loc>
+    <loc>https://blogsite-3-zaob.onrender.com/</loc>
   </url>
 </urlset>`);
-  }
+    }
+
+    res.setHeader("Content-Type", "application/xml");
+    res.status(200).send(data);
+  });
 });
 
 // -----------------------
