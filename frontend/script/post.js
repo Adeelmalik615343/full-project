@@ -6,7 +6,7 @@ const metaDesc = document.getElementById("metaDesc");
 const pathParts = window.location.pathname.split("/post/");
 const slug = pathParts[1];
 
-const BASE_URL = "https://blogsite-3-zaob.onrender.com"; // Backend API URL
+const BASE_URL = "https://full-project-5.onrender.com"; // Backend API URL
 
 if (!slug) {
   postBox.innerHTML = "<p>Post not found</p>";
