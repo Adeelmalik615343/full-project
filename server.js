@@ -122,7 +122,7 @@ app.get("/api/frontend/blogs", async (req, res) => {
 // -----------------------
 app.get("/sitemap.xml", async (req, res) => {
   res.setHeader("Content-Type", "application/xml");
-  const baseUrl = "https://blogsite-3-zaob.onrender.com";
+  const baseUrl = "https://full-project-5.onrender.com";
 
   try {
     // Check if manual sitemap exists
