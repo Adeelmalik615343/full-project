@@ -75,88 +75,55 @@ const escapeXml = (str = "") =>
 // -----------------------
 // SEO Blog Page
 // -----------------------
+// -----------------------
+// SEO Blog Page
+// -----------------------
 app.get("/post/:slug", async (req, res) => {
   try {
     const blog = await Blog.findOne({ slug: req.params.slug });
     if (!blog) return res.status(404).send("Post not found");
 
     const isUrdu = blog.language === "urdu";
-res.send(`<!DOCTYPE html>
+
+    res.send(`<!DOCTYPE html>
 <html lang="${isUrdu ? "ur" : "en"}" dir="${isUrdu ? "rtl" : "ltr"}">
 <head>
   <meta charset="UTF-8">
-
   <title>${escapeXml(blog.seoTitle || blog.title)}</title>
   <meta name="description" content="${escapeXml(blog.seoDescription || "")}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Urdu Font -->
   ${isUrdu ? `
   <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&display=swap" rel="stylesheet">
   ` : ""}
 
   <style>
-    :root {
-      --max-width: 820px;
-    }
-
     body {
       margin: 0;
-      padding: 0;
       background: #f9fafb;
       color: #111;
       font-family: ${isUrdu
         ? '"Noto Nastaliq Urdu", serif'
         : 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'};
       line-height: 1.9;
+      direction: ${isUrdu ? "rtl" : "ltr"};
     }
-
     .container {
-      max-width: var(--max-width);
+      max-width: 820px;
       margin: auto;
       padding: 16px;
     }
-
     h1 {
-      font-size: 2rem;
-      margin-bottom: 16px;
-      line-height: 1.6;
       text-align: ${isUrdu ? "right" : "left"};
     }
-
     img {
       max-width: 100%;
-      height: auto;
       border-radius: 10px;
       margin: 16px 0;
     }
-
     .content {
-      font-size: ${isUrdu ? "1.15rem" : "1rem"};
       text-align: ${isUrdu ? "right" : "left"};
-    }
-
-    .content p {
-      margin-bottom: 16px;
-    }
-
-    .content ul,
-    .content ol {
-      padding-${isUrdu ? "right" : "left"}: 24px;
-    }
-
-    .content li {
-      margin-bottom: 8px;
-    }
-
-    /* Mobile */
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 1.6rem;
-      }
-      .content {
-        font-size: ${isUrdu ? "1.05rem" : "0.95rem"};
-      }
+      font-size: ${isUrdu ? "1.15rem" : "1rem"};
     }
   </style>
 </head>
@@ -167,7 +134,7 @@ res.send(`<!DOCTYPE html>
       <h1>${escapeXml(blog.title)}</h1>
 
       ${blog.image ? `
-        <img src="${blog.image}" alt="${escapeXml(blog.title)}" loading="lazy" />
+        <img src="${blog.image}" alt="${escapeXml(blog.title)}" loading="lazy">
       ` : ""}
 
       <div class="content">
@@ -177,17 +144,9 @@ res.send(`<!DOCTYPE html>
   </main>
 </body>
 </html>`);
-// -----------------------
-// Frontend API
-// -----------------------
-app.get("/api/frontend/blogs", async (req, res) => {
-  try {
-    const blogs = await Blog.find()
-      .sort({ createdAt: -1 })
-      .select("title slug image seoDescription language createdAt");
-    res.json(blogs);
   } catch (err) {
-    res.status(500).json({ message: "Failed to load blogs" });
+    console.error("❌ Blog error:", err);
+    res.status(500).send("Server error");
   }
 });
 
