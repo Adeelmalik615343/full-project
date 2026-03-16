@@ -3,10 +3,12 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
-
 const Blog = require("./models/Blog");
 const blogRoutes = require("./routes/blogRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+
+// Utility to generate prerendered sitemap
+const generateSitemap = require("./utils/generateSitemap");
 
 const app = express();
 
@@ -23,7 +25,6 @@ app.use(cors({
   origin: "*",
   methods: ["GET", "POST", "PUT", "DELETE"],
 }));
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -39,45 +40,11 @@ Sitemap: https://full-project-5.onrender.com/sitemap.xml`);
 });
 
 // -----------------------
-// SITEMAP.XML (Dynamic from DB)
+// SITEMAP.XML (Prerendered)
 // -----------------------
-app.get("/sitemap.xml", async (req, res) => {
-  try {
-    const blogs = await Blog.find({}, "slug updatedAt");
-
-    let sitemap = `<?xml version="1.0" encoding="UTF-8"?>`;
-    sitemap += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
-
-    // Homepage
-    sitemap += `
-      <url>
-        <loc>https://full-project-5.onrender.com/</loc>
-        <changefreq>daily</changefreq>
-        <priority>1.0</priority>
-      </url>
-    `;
-
-    // Blog posts
-    blogs.forEach(blog => {
-      sitemap += `
-        <url>
-          <loc>https://full-project-5.onrender.com/post/${blog.slug}</loc>
-          <lastmod>${blog.updatedAt ? blog.updatedAt.toISOString() : new Date().toISOString()}</lastmod>
-          <changefreq>weekly</changefreq>
-          <priority>0.8</priority>
-        </url>
-      `;
-    });
-
-    sitemap += `</urlset>`;
-
-    res.header("Content-Type", "application/xml");
-    res.send(sitemap);
-
-  } catch (error) {
-    console.error("Sitemap error:", error);
-    res.status(500).send("Error generating sitemap");
-  }
+app.get("/sitemap.xml", (req, res) => {
+  res.header("Content-Type", "application/xml");
+  res.sendFile(path.join(__dirname, "frontend/sitemap.xml"));
 });
 
 // -----------------------
@@ -95,7 +62,7 @@ app.use("/admin/api", adminRoutes);
 // Landing Page
 // -----------------------
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "frontend", "index.html"));
+  res.sendFile(path.join(__dirname, "frontend/index.html"));
 });
 
 // -----------------------
@@ -105,7 +72,7 @@ app.get("/admin", (req, res) => {
   const key = req.query.key;
   if (!key) return res.status(403).send("Admin key missing");
 
-  res.sendFile(path.join(__dirname, "frontend", "admin", "admin.html"));
+  res.sendFile(path.join(__dirname, "frontend/admin/admin.html"));
 });
 
 // -----------------------
@@ -175,6 +142,20 @@ ${blog.content}
     res.status(500).send("Server error");
   }
 });
+
+// -----------------------
+// Re-generate sitemap on blog create/update
+// -----------------------
+// Example: Call this in your blogRoutes after create/update
+async function updateSitemap() {
+  try {
+    const blogs = await Blog.find({}, "slug updatedAt");
+    generateSitemap(blogs); // writes frontend/sitemap.xml
+  } catch (err) {
+    console.error("Error updating sitemap:", err);
+  }
+}
+// Use updateSitemap() wherever a blog is added or updated
 
 // -----------------------
 // Start Server
