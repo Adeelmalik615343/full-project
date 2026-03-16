@@ -8,7 +8,9 @@ const fs = require("fs");
 const Blog = require("./models/Blog");
 const blogRoutes = require("./routes/blogRoutes");
 const adminRoutes = require("./routes/adminRoutes");
-const generateSitemap = require("./utils/generateSitemap");
+
+// Correct path to sitemap utility
+const generateSitemap = require("./src/utils/generateSitemap");
 
 const app = express();
 
@@ -73,7 +75,6 @@ app.get("/", (req, res) => {
 app.get("/admin", (req, res) => {
   const key = req.query.key;
   if (!key) return res.status(403).send("Admin key missing");
-
   res.sendFile(path.join(__dirname, "frontend/admin/admin.html"));
 });
 
@@ -94,6 +95,7 @@ app.get("/post/:slug", async (req, res) => {
     if (!blog) return res.status(404).send("Post not found");
 
     const isUrdu = blog.language === "urdu";
+
     res.send(`<!DOCTYPE html>
 <html lang="${isUrdu ? "ur" : "en"}" dir="${isUrdu ? "rtl" : "ltr"}">
 <head>
@@ -155,7 +157,7 @@ async function updateSitemap() {
     console.error("Error updating sitemap:", err);
   }
 }
-// Call updateSitemap() in your blog create/update routes
+// Call updateSitemap() in blog create/update routes
 
 // -----------------------
 // Start Server
@@ -178,4 +180,5 @@ async function startServer() {
   }
 }
 
+// Call startServer last
 startServer();
