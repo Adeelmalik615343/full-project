@@ -39,6 +39,14 @@ Sitemap: https://full-project-5.onrender.com/sitemap.xml`);
 });
 
 // -----------------------
+// SITEMAP.XML (IMPORTANT)
+// -----------------------
+app.get("/sitemap.xml", (req, res) => {
+  res.header("Content-Type", "application/xml");
+  res.sendFile(path.join(__dirname, "frontend", "sitemap.xml"));
+});
+
+// -----------------------
 // Serve Static Frontend
 // -----------------------
 app.use(express.static(path.join(__dirname, "frontend")));
