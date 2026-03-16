@@ -3,11 +3,11 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
+const fs = require("fs");
+
 const Blog = require("./models/Blog");
 const blogRoutes = require("./routes/blogRoutes");
 const adminRoutes = require("./routes/adminRoutes");
-
-// Utility to generate prerendered sitemap
 const generateSitemap = require("./utils/generateSitemap");
 
 const app = express();
@@ -21,10 +21,7 @@ mongoose.set("bufferCommands", false);
 // -----------------------
 // Middleware
 // -----------------------
-app.use(cors({
-  origin: "*",
-  methods: ["GET", "POST", "PUT", "DELETE"],
-}));
+app.use(cors({ origin: "*", methods: ["GET", "POST", "PUT", "DELETE"] }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -43,8 +40,13 @@ Sitemap: https://full-project-5.onrender.com/sitemap.xml`);
 // SITEMAP.XML (Prerendered)
 // -----------------------
 app.get("/sitemap.xml", (req, res) => {
-  res.header("Content-Type", "application/xml");
-  res.sendFile(path.join(__dirname, "frontend/sitemap.xml"));
+  const sitemapPath = path.join(__dirname, "frontend/sitemap.xml");
+  if (fs.existsSync(sitemapPath)) {
+    res.header("Content-Type", "application/xml");
+    res.sendFile(sitemapPath);
+  } else {
+    res.status(404).send("Sitemap not found");
+  }
 });
 
 // -----------------------
@@ -92,7 +94,6 @@ app.get("/post/:slug", async (req, res) => {
     if (!blog) return res.status(404).send("Post not found");
 
     const isUrdu = blog.language === "urdu";
-
     res.send(`<!DOCTYPE html>
 <html lang="${isUrdu ? "ur" : "en"}" dir="${isUrdu ? "rtl" : "ltr"}">
 <head>
@@ -144,9 +145,8 @@ ${blog.content}
 });
 
 // -----------------------
-// Re-generate sitemap on blog create/update
+// Update sitemap utility
 // -----------------------
-// Example: Call this in your blogRoutes after create/update
 async function updateSitemap() {
   try {
     const blogs = await Blog.find({}, "slug updatedAt");
@@ -155,7 +155,7 @@ async function updateSitemap() {
     console.error("Error updating sitemap:", err);
   }
 }
-// Use updateSitemap() wherever a blog is added or updated
+// Call updateSitemap() in your blog create/update routes
 
 // -----------------------
 // Start Server
@@ -164,6 +164,9 @@ async function startServer() {
   try {
     await mongoose.connect(process.env.MONGO_URI);
     console.log("MongoDB Connected");
+
+    // Pre-generate sitemap on server start
+    await updateSitemap();
 
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => {
