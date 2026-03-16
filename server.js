@@ -44,14 +44,6 @@ Sitemap: https://full-project-5.onrender.com/sitemap.xml`);
 app.use(express.static(path.join(__dirname, "frontend")));
 
 // -----------------------
-// MANUAL SITEMAP
-// frontend/sitemap.xml
-// -----------------------
-app.get("/sitemap.xml", (req, res) => {
-  res.sendFile(path.join(__dirname, "frontend", "sitemap.xml"));
-});
-
-// -----------------------
 // API Routes
 // -----------------------
 app.use("/api/blogs", blogRoutes);
@@ -68,10 +60,13 @@ app.get("/", (req, res) => {
 // Admin Page
 // -----------------------
 app.get("/admin", (req, res) => {
+
   const key = req.query.key;
+
   if (!key) return res.status(403).send("Admin key missing");
 
   res.sendFile(path.join(__dirname, "frontend", "admin", "admin.html"));
+
 });
 
 // -----------------------
@@ -86,7 +81,9 @@ const escapeXml = (str = "") =>
 // SEO Blog Page
 // -----------------------
 app.get("/post/:slug", async (req, res) => {
+
   try {
+
     const blog = await Blog.findOne({ slug: req.params.slug });
 
     if (!blog) return res.status(404).send("Post not found");
@@ -95,6 +92,7 @@ app.get("/post/:slug", async (req, res) => {
 
     res.send(`<!DOCTYPE html>
 <html lang="${isUrdu ? "ur" : "en"}" dir="${isUrdu ? "rtl" : "ltr"}">
+
 <head>
 
 <meta charset="UTF-8">
@@ -115,7 +113,7 @@ background:#f9fafb;
 color:#111;
 font-family:${isUrdu
         ? '"Noto Nastaliq Urdu", serif'
-        : 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'};
+        : 'system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif'};
 line-height:1.9;
 direction:${isUrdu ? "rtl" : "ltr"};
 }
@@ -159,18 +157,23 @@ ${blog.content}
 </main>
 
 </body>
+
 </html>`);
 
   } catch (err) {
+
     console.error("Blog error:", err);
     res.status(500).send("Server error");
+
   }
+
 });
 
 // -----------------------
 // Start Server
 // -----------------------
 async function startServer() {
+
   try {
 
     await mongoose.connect(process.env.MONGO_URI);
@@ -189,6 +192,7 @@ async function startServer() {
     process.exit(1);
 
   }
+
 }
 
 startServer();
