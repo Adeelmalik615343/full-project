@@ -1,0 +1,14 @@
+name: Ping Render Sitemap
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'  # every 15 minutes
+  workflow_dispatch:        # allows manual run
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Render sitemap
+        run: |
+          curl -I https://full-project-5.onrender.com/sitemap.xml
