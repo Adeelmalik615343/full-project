@@ -8,8 +8,6 @@ const fs = require("fs");
 const Blog = require("./models/Blog");
 const blogRoutes = require("./routes/blogRoutes");
 const adminRoutes = require("./routes/adminRoutes");
-
-// Correct path to sitemap utility
 const generateSitemap = require("./src/utils/generateSitemap");
 
 const app = express();
@@ -39,7 +37,7 @@ Sitemap: https://full-project-5.onrender.com/sitemap.xml`);
 });
 
 // -----------------------
-// SITEMAP.XML (Prerendered)
+// SITEMAP.XML
 // -----------------------
 app.get("/sitemap.xml", (req, res) => {
   const sitemapPath = path.join(__dirname, "frontend/sitemap.xml");
@@ -52,7 +50,7 @@ app.get("/sitemap.xml", (req, res) => {
 });
 
 // -----------------------
-// Serve Static Frontend
+// Static Frontend
 // -----------------------
 app.use(express.static(path.join(__dirname, "frontend")));
 
@@ -87,12 +85,25 @@ const escapeXml = (str = "") =>
   );
 
 // -----------------------
-// SEO Blog Page
+// BLOG PAGE (UPDATED)
 // -----------------------
 app.get("/post/:slug", async (req, res) => {
   try {
     const blog = await Blog.findOne({ slug: req.params.slug });
     if (!blog) return res.status(404).send("Post not found");
+
+    // 🔥 Latest posts
+    const latestPosts = await Blog.find({})
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .select("title slug image");
+
+    const latestHTML = latestPosts.map(p => `
+      <a href="/post/${p.slug}" style="display:block;margin-bottom:12px;text-decoration:none;color:#111;">
+        ${p.image ? `<img src="${p.image}" style="width:100%;border-radius:8px;">` : ""}
+        <p style="margin:6px 0;font-weight:600;">${escapeXml(p.title)}</p>
+      </a>
+    `).join("");
 
     const isUrdu = blog.language === "urdu";
 
@@ -103,43 +114,92 @@ app.get("/post/:slug", async (req, res) => {
 <title>${escapeXml(blog.seoTitle || blog.title)}</title>
 <meta name="description" content="${escapeXml(blog.seoDescription || "")}">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-${isUrdu ? `<link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&display=swap" rel="stylesheet">` : ""}
+
 <style>
 body{
   margin:0;
-  background:#f9fafb;
-  color:#111;
-  font-family:${isUrdu ? '"Noto Nastaliq Urdu", serif' : 'system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif'};
-  line-height:1.9;
+  background:#f3f4f6;
+  font-family:${isUrdu ? '"Noto Nastaliq Urdu", serif' : 'system-ui'};
   direction:${isUrdu ? "rtl" : "ltr"};
 }
-.container{
-  max-width:820px;
+
+.wrapper{
+  max-width:1100px;
   margin:auto;
+  display:flex;
+  gap:20px;
   padding:16px;
 }
-img{
-  max-width:100%;
+
+.main{
+  flex:3;
+  background:#fff;
+  padding:20px;
+  border-radius:10px;
+}
+
+.sidebar{
+  flex:1;
+  background:#fff;
+  padding:16px;
+  border-radius:10px;
+  position:sticky;
+  top:20px;
+  height:fit-content;
+}
+
+h1{
+  margin-bottom:10px;
+}
+
+.featured{
+  width:100%;
   border-radius:10px;
   margin:16px 0;
 }
+
 .content{
-  font-size:${isUrdu ? "1.15rem" : "1rem"};
+  line-height:1.8;
+}
+
+.sidebar h3{
+  margin-bottom:10px;
+}
+
+@media(max-width:768px){
+  .wrapper{
+    flex-direction:column;
+  }
 }
 </style>
 </head>
+
 <body>
-<main class="container">
-<article>
-<h1>${escapeXml(blog.title)}</h1>
-${blog.image ? `<img src="${blog.image}" alt="${escapeXml(blog.title)}" loading="lazy">` : ""}
-<div class="content">
-${blog.content}
+
+<div class="wrapper">
+
+  <!-- MAIN -->
+  <div class="main">
+    <h1>${escapeXml(blog.title)}</h1>
+
+    ${blog.image ? `<img class="featured" src="${blog.image}" alt="${escapeXml(blog.title)}">` : ""}
+
+    <div class="content">
+      ${blog.content}
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h3>Latest Posts</h3>
+    ${latestHTML}
+  </div>
+
 </div>
-</article>
-</main>
+
 </body>
 </html>`);
+
   } catch (err) {
     console.error("Blog error:", err);
     res.status(500).send("Server error");
@@ -147,17 +207,16 @@ ${blog.content}
 });
 
 // -----------------------
-// Update sitemap utility
+// Sitemap Update
 // -----------------------
 async function updateSitemap() {
   try {
     const blogs = await Blog.find({}, "slug updatedAt");
-    generateSitemap(blogs); // writes frontend/sitemap.xml
+    generateSitemap(blogs);
   } catch (err) {
     console.error("Error updating sitemap:", err);
   }
 }
-// Call updateSitemap() in blog create/update routes
 
 // -----------------------
 // Start Server
@@ -167,7 +226,6 @@ async function startServer() {
     await mongoose.connect(process.env.MONGO_URI);
     console.log("MongoDB Connected");
 
-    // Pre-generate sitemap on server start
     await updateSitemap();
 
     const PORT = process.env.PORT || 5000;
@@ -180,5 +238,4 @@ async function startServer() {
   }
 }
 
-// Call startServer last
 startServer();
