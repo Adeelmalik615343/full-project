@@ -26,7 +26,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // -----------------------
-// ROBOTS.TXT
+// ROBOTS.TXT (STATIC)
 // -----------------------
 app.get("/robots.txt", (req, res) => {
   res.type("text/plain");
@@ -77,7 +77,7 @@ app.get("/admin", (req, res) => {
 });
 
 // -----------------------
-// Escape XML helper
+// Escape helper
 // -----------------------
 const escapeXml = (str = "") =>
   str.replace(/[<>&'"]/g, c =>
@@ -85,25 +85,18 @@ const escapeXml = (str = "") =>
   );
 
 // -----------------------
-// BLOG PAGE (UPDATED)
+// BLOG PAGE (PRO DESIGN)
 // -----------------------
 app.get("/post/:slug", async (req, res) => {
   try {
     const blog = await Blog.findOne({ slug: req.params.slug });
     if (!blog) return res.status(404).send("Post not found");
 
-    // 🔥 Latest posts
+    // Latest posts
     const latestPosts = await Blog.find({})
       .sort({ createdAt: -1 })
       .limit(5)
       .select("title slug image");
-
-    const latestHTML = latestPosts.map(p => `
-      <a href="/post/${p.slug}" style="display:block;margin-bottom:12px;text-decoration:none;color:#111;">
-        ${p.image ? `<img src="${p.image}" style="width:100%;border-radius:8px;">` : ""}
-        <p style="margin:6px 0;font-weight:600;">${escapeXml(p.title)}</p>
-      </a>
-    `).join("");
 
     const isUrdu = blog.language === "urdu";
 
@@ -116,59 +109,112 @@ app.get("/post/:slug", async (req, res) => {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
 body{
-  margin:0;
-  background:#f3f4f6;
-  font-family:${isUrdu ? '"Noto Nastaliq Urdu", serif' : 'system-ui'};
-  direction:${isUrdu ? "rtl" : "ltr"};
+  background:#f5f7fa;
+  color:#111;
+  font-family:${isUrdu ? '"Noto Nastaliq Urdu", serif' : '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif'};
+  line-height:1.8;
 }
 
-.wrapper{
-  max-width:1100px;
+.container{
+  max-width:1200px;
   margin:auto;
-  display:flex;
-  gap:20px;
   padding:16px;
 }
 
-.main{
-  flex:3;
-  background:#fff;
-  padding:20px;
-  border-radius:10px;
+.grid{
+  display:grid;
+  grid-template-columns:3fr 1fr;
+  gap:24px;
 }
 
-.sidebar{
-  flex:1;
+.post{
   background:#fff;
-  padding:16px;
-  border-radius:10px;
-  position:sticky;
-  top:20px;
-  height:fit-content;
+  padding:24px;
+  border-radius:12px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.05);
 }
 
-h1{
+.post h1{
+  font-size:2rem;
+  margin-bottom:10px;
+}
+
+.meta{
+  color:#666;
+  font-size:0.9rem;
   margin-bottom:10px;
 }
 
 .featured{
   width:100%;
+  border-radius:12px;
+  margin:20px 0;
+}
+
+.content{
+  font-size:1.05rem;
+}
+
+.content img{
+  max-width:100%;
   border-radius:10px;
   margin:16px 0;
 }
 
-.content{
-  line-height:1.8;
+.sidebar{
+  background:#fff;
+  padding:20px;
+  border-radius:12px;
+  position:sticky;
+  top:20px;
+  height:fit-content;
+  box-shadow:0 4px 10px rgba(0,0,0,0.05);
 }
 
 .sidebar h3{
-  margin-bottom:10px;
+  margin-bottom:16px;
 }
 
-@media(max-width:768px){
-  .wrapper{
-    flex-direction:column;
+.latest-post{
+  display:block;
+  text-decoration:none;
+  color:#111;
+  margin-bottom:16px;
+}
+
+.latest-post img{
+  width:100%;
+  border-radius:8px;
+}
+
+.latest-post p{
+  font-size:0.95rem;
+  margin-top:6px;
+  font-weight:600;
+}
+
+/* MOBILE */
+@media(max-width:900px){
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  .sidebar{
+    position:relative;
+    top:0;
+  }
+}
+
+@media(max-width:600px){
+  .post{
+    padding:16px;
+  }
+
+  .post h1{
+    font-size:1.5rem;
   }
 }
 </style>
@@ -176,23 +222,40 @@ h1{
 
 <body>
 
-<div class="wrapper">
+<div class="container">
 
-  <!-- MAIN -->
-  <div class="main">
-    <h1>${escapeXml(blog.title)}</h1>
+  <div class="grid">
 
-    ${blog.image ? `<img class="featured" src="${blog.image}" alt="${escapeXml(blog.title)}">` : ""}
+    <!-- MAIN POST -->
+    <article class="post">
 
-    <div class="content">
-      ${blog.content}
-    </div>
-  </div>
+      <h1>${escapeXml(blog.title)}</h1>
 
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <h3>Latest Posts</h3>
-    ${latestHTML}
+      <div class="meta">
+        ${new Date(blog.createdAt).toDateString()}
+      </div>
+
+      ${blog.image ? `<img class="featured" src="${blog.image}" alt="${escapeXml(blog.title)}">` : ""}
+
+      <div class="content">
+        ${blog.content}
+      </div>
+
+    </article>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <h3>Latest Posts</h3>
+
+      ${latestPosts.map(p => `
+        <a class="latest-post" href="/post/${p.slug}">
+          ${p.image ? `<img src="${p.image}">` : ""}
+          <p>${escapeXml(p.title)}</p>
+        </a>
+      `).join("")}
+
+    </aside>
+
   </div>
 
 </div>
@@ -201,7 +264,7 @@ h1{
 </html>`);
 
   } catch (err) {
-    console.error("Blog error:", err);
+    console.error(err);
     res.status(500).send("Server error");
   }
 });
@@ -214,7 +277,7 @@ async function updateSitemap() {
     const blogs = await Blog.find({}, "slug updatedAt");
     generateSitemap(blogs);
   } catch (err) {
-    console.error("Error updating sitemap:", err);
+    console.error(err);
   }
 }
 
@@ -233,7 +296,7 @@ async function startServer() {
       console.log("Server running on port", PORT);
     });
   } catch (err) {
-    console.error("MongoDB failed:", err.message);
+    console.error(err);
     process.exit(1);
   }
 }
